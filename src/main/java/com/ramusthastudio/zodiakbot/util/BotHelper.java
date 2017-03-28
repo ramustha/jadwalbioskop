@@ -14,6 +14,8 @@ import com.linecorp.bot.model.message.template.Template;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.ramusthastudio.zodiakbot.controller.CinemaService;
+import com.ramusthastudio.zodiakbot.controller.MovieDbService;
+import com.ramusthastudio.zodiakbot.model.DiscoverMovies;
 import com.ramusthastudio.zodiakbot.model.Result;
 import java.io.IOException;
 import java.security.KeyStore;
@@ -63,6 +65,7 @@ public final class BotHelper {
   public static final String MESSAGE_STICKER = "sticker";
 
   public static final String KEY_TODAY = "hari ini";
+  public static final String IMG_HOLDER = "https://lh6.googleusercontent.com/E0VKf6AlrQ7LK3TA8Pcqyoh8c74icxKl64HohlBrLKeSW5XBsdfVyFy8ssAg4FNQY67wROqDBNPHZfc=w1920-h905";
 
   private static LineMessagingService lineServiceBuilder(String aChannelAccessToken) {
     OkHttpClient.Builder client = new OkHttpClient.Builder()
@@ -254,14 +257,25 @@ public final class BotHelper {
     return matcher.replaceAll(" ");
   }
 
-  public static CinemaService createdService(String aBaseUrl) {
+  public static MovieDbService createdMovieDbService(String aBaseUrl) {
+    Retrofit retrofit = new Retrofit.Builder().baseUrl(aBaseUrl)
+        .addConverterFactory(GsonConverterFactory.create()).build();
+    return retrofit.create(MovieDbService.class);
+  }
+
+  public static CinemaService createdCinemaService(String aBaseUrl) {
     Retrofit retrofit = new Retrofit.Builder().baseUrl(aBaseUrl)
         .addConverterFactory(GsonConverterFactory.create()).build();
     return retrofit.create(CinemaService.class);
   }
 
   public static Response<Result> getCinemaToday(String aBaseUrl, String aKey, String aCityId) throws IOException {
-    CinemaService service = createdService(aBaseUrl);
+    CinemaService service = createdCinemaService(aBaseUrl);
     return service.cinemaToday(aKey, aCityId).execute();
+  }
+
+  public static Response<DiscoverMovies> getSearchMovies(String aBaseUrl, String aApiKey, String aTitle) throws IOException {
+    MovieDbService service = createdMovieDbService(aBaseUrl);
+    return service.searchMovies(aApiKey, aTitle).execute();
   }
 }
