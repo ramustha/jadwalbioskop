@@ -1,7 +1,5 @@
 package com.ramusthastudio.zodiakbot.util;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.linecorp.bot.client.LineMessagingService;
 import com.linecorp.bot.client.LineMessagingServiceBuilder;
 import com.linecorp.bot.model.Multicast;
@@ -15,8 +13,8 @@ import com.linecorp.bot.model.message.template.ConfirmTemplate;
 import com.linecorp.bot.model.message.template.Template;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.model.response.BotApiResponse;
-import com.ramusthastudio.zodiakbot.controller.ZodiakService;
-import com.ramusthastudio.zodiakbot.model.Result;
+import com.ramusthastudio.zodiakbot.controller.CinemaService;
+import com.ramusthastudio.zodiakbot.model.CinemaResult;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -64,10 +62,7 @@ public final class BotHelper {
   public static final String MESSAGE_LOCATION = "location";
   public static final String MESSAGE_STICKER = "sticker";
 
-  public static final String KEY_ZODIAC = "ramalan";
-  public static final String KEY_GENERAL = "umum";
-  public static final String KEY_ROMANCE = "percintaan";
-  public static final String KEY_FINANCE = "keuangan";
+  public static final String KEY_TODAY = "hari ini";
 
   private static LineMessagingService lineServiceBuilder(String aChannelAccessToken) {
     OkHttpClient.Builder client = new OkHttpClient.Builder()
@@ -188,10 +183,9 @@ public final class BotHelper {
   public static void greetingMessageGroup(String aChannelAccessToken, String aUserId) throws IOException {
     String greeting = "Hi manteman\n";
     greeting += "Makasih aku udah di invite disini!\n";
-    greeting += "Aku Zodi, bot yang bisa membaca zodiak dari nama dan tanggal lahir, ";
-    greeting += "buat kamu yang pengen tau ramalan zodiak, percintaan, keuangan kamu hari ini caranya gampang, ";
-    greeting += "kamu tinggal tulis aja nama dan tanggal lahir kamu seperti ini : ramalan dadang 27-03-1991\n\n";
-    greeting += "Kalau kamu suka dengan aku, bantuin aku donk supaya punya banyak teman, ini id aku @yjb9380i";
+    greeting += "Aku adalah bot yang bisa memberi tahu kamu jadwal theater bioskop, ";
+    greeting += "jadwal bioskop yang aku tahu bukan hanya satu kota loh tapi seluruh di Indonesia.";
+    greeting += "Kalau kamu suka dengan aku, bantuin aku donk supaya punya banyak teman, ini id aku @kgo8218w";
     stickerMessage(aChannelAccessToken, aUserId, new StickerHelper.StickerMsg(JAMES_STICKER_TWO_THUMBS));
     pushMessage(aChannelAccessToken, aUserId, greeting);
   }
@@ -200,10 +194,9 @@ public final class BotHelper {
     UserProfileResponse userProfile = getUserProfile(aChannelAccessToken, aUserId);
     String greeting = "Hi " + userProfile.getDisplayName() + "\n";
     greeting += "Makasih udah nambahin aku sebagai teman!\n";
-    greeting += "Aku Zodi, bot yang bisa membaca zodiak dari nama dan tanggal lahir, ";
-    greeting += "buat kamu yang pengen tau ramalan zodiak, percintaan, keuangan kamu hari ini caranya gampang, ";
-    greeting += "kamu tinggal tulis aja nama dan tanggal lahir kamu seperti ini : ramalan dadang 27-03-1991\n\n";
-    greeting += "Kalau kamu suka dengan aku, bantuin aku donk supaya punya banyak teman, ini id aku @yjb9380i";
+    greeting += "Aku adalah bot yang bisa memberi tahu kamu jadwal theater bioskop, ";
+    greeting += "jadwal bioskop yang aku tahu bukan hanya satu kota loh tapi seluruh di Indonesia.";
+    greeting += "Kalau kamu suka dengan aku, bantuin aku donk supaya punya banyak teman, ini id aku @kgo8218w";
     stickerMessage(aChannelAccessToken, aUserId, new StickerHelper.StickerMsg(JAMES_STICKER_TWO_THUMBS));
     pushMessage(aChannelAccessToken, aUserId, greeting);
   }
@@ -218,7 +211,7 @@ public final class BotHelper {
   public static void instructionTweetsMessage(String aChannelAccessToken, String aUserId) throws IOException {
     UserProfileResponse userProfile = getUserProfile(aChannelAccessToken, aUserId);
     String greeting = "Hi " + userProfile.getDisplayName() + "\n";
-    greeting += "Kamu tinggal tulis aja nama dan tanggal lahir kamu seperti ini : ramalan dadang 27-03-1991";
+    greeting += "Kamu tinggal tulis aja " + KEY_TODAY + ", di kota mana, contoh : " + KEY_TODAY + " Bandung";
     pushMessage(aChannelAccessToken, aUserId, greeting);
   }
 
@@ -261,18 +254,14 @@ public final class BotHelper {
     return matcher.replaceAll(" ");
   }
 
-  public static ZodiakService createdService(String aBaseUrl) {
-    Gson gson = new GsonBuilder()
-        .setLenient()
-        .create();
-
+  public static CinemaService createdService(String aBaseUrl) {
     Retrofit retrofit = new Retrofit.Builder().baseUrl(aBaseUrl)
         .addConverterFactory(GsonConverterFactory.create()).build();
-    return retrofit.create(ZodiakService.class);
+    return retrofit.create(CinemaService.class);
   }
 
-  public static Response<Result> getZodiac(String aBaseUrl, String aName, String aDate) throws IOException {
-    ZodiakService service = createdService(aBaseUrl);
-    return service.zodiac(aName, aDate).execute();
+  public static Response<CinemaResult> getCinemaToday(String aBaseUrl, String aKey, String aCityId) throws IOException {
+    CinemaService service = createdService(aBaseUrl);
+    return service.cinemaToday(aKey, aCityId).execute();
   }
 }

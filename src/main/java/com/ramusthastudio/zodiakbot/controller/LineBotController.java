@@ -2,12 +2,15 @@ package com.ramusthastudio.zodiakbot.controller;
 
 import com.google.gson.Gson;
 import com.linecorp.bot.client.LineSignatureValidator;
+import com.ramusthastudio.zodiakbot.model.CinemaResult;
+import com.ramusthastudio.zodiakbot.model.Data;
 import com.ramusthastudio.zodiakbot.model.Events;
 import com.ramusthastudio.zodiakbot.model.Message;
 import com.ramusthastudio.zodiakbot.model.Payload;
 import com.ramusthastudio.zodiakbot.model.Postback;
 import com.ramusthastudio.zodiakbot.model.Source;
 import java.io.IOException;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import retrofit2.Response;
 
 import static com.ramusthastudio.zodiakbot.util.BotHelper.FOLLOW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.JOIN;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.LEAVE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE_TEXT;
@@ -30,11 +35,14 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_GROUP;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_ROOM;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_USER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.UNFOLLOW;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.getCinemaToday;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessageGroup;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.instructionTweetsMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.pushMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.replayMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.unfollowMessage;
+import static com.ramusthastudio.zodiakbot.util.CinemaHelper.generateCinemaId;
 
 @RestController
 @RequestMapping(value = "/linebot")
@@ -104,7 +112,7 @@ public class LineBotController {
           sourceUserProccess(eventType, replayToken, timestamp, message, postback, userId);
           break;
         case SOURCE_GROUP:
-          sourceGroupProccess(eventType, replayToken, postback, message, source);
+          // sourceGroupProccess(eventType, replayToken, postback, message, source);
           break;
         case SOURCE_ROOM:
           // sourceGroupProccess(eventType, replayToken, postback, message, source);
@@ -152,15 +160,36 @@ public class LineBotController {
         case FOLLOW:
           LOG.info("Greeting Message");
           greetingMessage(fChannelAccessToken, aUserId);
+          instructionTweetsMessage(fChannelAccessToken, aUserId);
           break;
         case MESSAGE:
           if (aMessage.type().equals(MESSAGE_TEXT)) {
             String text = aMessage.text();
             replayMessage(fChannelAccessToken, aReplayToken, text);
+            if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+              String city = text.substring(KEY_TODAY.length(), text.length()).trim();
+              String cityCandidate = generateCinemaId(city);
+              if (cityCandidate != null) {
+                Response<CinemaResult> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+                LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
 
+                if (cinemaToday.isSuccessful()) {
+                  CinemaResult cinemaRes = cinemaToday.body();
+                  LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
+
+                  List<Data> dataCinema = cinemaRes.getCinemaDatas();
+                  for (Data data : dataCinema) {
+                    LOG.info("Movie {} genre {} jadwal {}", data.getMovie(), data.getDuration(), data.getSchedule());
+                  }
+                } else {
+                  pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
+                }
+              } else {
+                pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
+              }
+            }
           } else {
-            pushMessage(fChannelAccessToken, aUserId, "Aku gak ngerti nih, " +
-                "aku ini cuma bot yang bisa membaca ramalan zodiak, jadi jangan tanya yang aneh aneh dulu yah");
+            pushMessage(fChannelAccessToken, aUserId, "Aku gak ngerti nih, jangan tanya yang aneh aneh dulu yah");
           }
           break;
         case POSTBACK:
