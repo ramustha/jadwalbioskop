@@ -74,79 +74,78 @@ public final class CinemaHelper {
   public static final String ID_YOGYAKARTA = "23";
 
   public static String generateCinemaId(String aCity) {
-    switch (aCity) {
-      case AMBON:
-        return ID_AMBON;
-      case BALIKPAPAN:
-        return ID_BALIKPAPAN;
-      case BANDUNG:
-        return ID_BANDUNG;
-      case BANJARMASIN:
-        return ID_BANJARMASIN;
-      case BATAM:
-        return ID_BATAM;
-      case BEKASI:
-        return ID_BEKASI;
-      case BENGKULU:
-        return ID_BENGKULU;
-      case BINJAI:
-        return ID_BINJAI;
-      case BOGOR:
-        return ID_BOGOR;
-      case CIREBON:
-        return ID_CIREBON;
-      case GORONTALO:
-        return ID_GORONTALO;
-      case JAKARTA:
-        return ID_JAKARTA;
-      case JAMBI:
-        return ID_JAMBI;
-      case JAYAPURA:
-        return ID_JAYAPURA;
-      case KARAWANG:
-        return ID_KARAWANG;
-      case LAMPUNG:
-        return ID_LAMPUNG;
-      case MAKASSAR:
-        return ID_MAKASSAR;
-      case MALANG:
-        return ID_MALANG;
-      case MANADO:
-        return ID_MANADO;
-      case MATARAM:
-        return ID_MATARAM;
-      case MEDAN:
-        return ID_MEDAN;
-      case PADANG:
-        return ID_PADANG;
-      case PALANGKARAYA:
-        return ID_PALANGKARAYA;
-      case PALEMBANG:
-        return ID_PALEMBANG;
-      case PALU:
-        return ID_PALU;
-      case PEKANBARU:
-        return ID_PEKANBARU;
-      case PONTIANAK:
-        return ID_PONTIANAK;
-      case SAMARINDA:
-        return ID_SAMARINDA;
-      case SEMARANG:
-        return ID_SEMARANG;
-      case SINGKAWANG:
-        return ID_SINGKAWANG;
-      case SURABAYA:
-        return ID_SURABAYA;
-      case SURAKARTA:
-        return ID_SURAKARTA;
-      case TANGERANG:
-        return ID_TANGERANG;
-      case TASIKMALAYA:
-        return ID_TASIKMALAYA;
-      case YOGYAKARTA:
-        return ID_YOGYAKARTA;
-        default:
-          return null;
+    if (aCity.equalsIgnoreCase(AMBON)) {
+      return ID_AMBON;
+    } else if (aCity.equalsIgnoreCase(BALIKPAPAN)) {
+      return ID_BALIKPAPAN;
+    } else if (aCity.equalsIgnoreCase(BANDUNG)) {
+      return ID_BANDUNG;
+    } else if (aCity.equalsIgnoreCase(BANJARMASIN)) {
+      return ID_BANJARMASIN;
+    } else if (aCity.equalsIgnoreCase(BATAM)) {
+      return ID_BATAM;
+    } else if (aCity.equalsIgnoreCase(BEKASI)) {
+      return ID_BEKASI;
+    } else if (aCity.equalsIgnoreCase(BENGKULU)) {
+      return ID_BENGKULU;
+    } else if (aCity.equalsIgnoreCase(BINJAI)) {
+      return ID_BINJAI;
+    } else if (aCity.equalsIgnoreCase(BOGOR)) {
+      return ID_BOGOR;
+    } else if (aCity.equalsIgnoreCase(CIREBON)) {
+      return ID_CIREBON;
+    } else if (aCity.equalsIgnoreCase(GORONTALO)) {
+      return ID_GORONTALO;
+    } else if (aCity.equalsIgnoreCase(JAKARTA)) {
+      return ID_JAKARTA;
+    } else if (aCity.equalsIgnoreCase(JAMBI)) {
+      return ID_JAMBI;
+    } else if (aCity.equalsIgnoreCase(JAYAPURA)) {
+      return ID_JAYAPURA;
+    } else if (aCity.equalsIgnoreCase(KARAWANG)) {
+      return ID_KARAWANG;
+    } else if (aCity.equalsIgnoreCase(LAMPUNG)) {
+      return ID_LAMPUNG;
+    } else if (aCity.equalsIgnoreCase(MAKASSAR)) {
+      return ID_MAKASSAR;
+    } else if (aCity.equalsIgnoreCase(MALANG)) {
+      return ID_MALANG;
+    } else if (aCity.equalsIgnoreCase(MANADO)) {
+      return ID_MANADO;
+    } else if (aCity.equalsIgnoreCase(MATARAM)) {
+      return ID_MATARAM;
+    } else if (aCity.equalsIgnoreCase(MEDAN)) {
+      return ID_MEDAN;
+    } else if (aCity.equalsIgnoreCase(PADANG)) {
+      return ID_PADANG;
+    } else if (aCity.equalsIgnoreCase(PALANGKARAYA)) {
+      return ID_PALANGKARAYA;
+    } else if (aCity.equalsIgnoreCase(PALEMBANG)) {
+      return ID_PALEMBANG;
+    } else if (aCity.equalsIgnoreCase(PALU)) {
+      return ID_PALU;
+    } else if (aCity.equalsIgnoreCase(PEKANBARU)) {
+      return ID_PEKANBARU;
+    } else if (aCity.equalsIgnoreCase(PONTIANAK)) {
+      return ID_PONTIANAK;
+    } else if (aCity.equalsIgnoreCase(SAMARINDA)) {
+      return ID_SAMARINDA;
+    } else if (aCity.equalsIgnoreCase(SEMARANG)) {
+      return ID_SEMARANG;
+    } else if (aCity.equalsIgnoreCase(SINGKAWANG)) {
+      return ID_SINGKAWANG;
+    } else if (aCity.equalsIgnoreCase(SURABAYA)) {
+      return ID_SURABAYA;
+    } else if (aCity.equalsIgnoreCase(SURAKARTA)) {
+      return ID_SURAKARTA;
+    } else if (aCity.equalsIgnoreCase(TANGERANG)) {
+      return ID_TANGERANG;
+    } else if (aCity.equalsIgnoreCase(TASIKMALAYA)) {
+      return ID_TASIKMALAYA;
+    } else if (aCity.equalsIgnoreCase(YOGYAKARTA)) {
+      return ID_YOGYAKARTA;
+    } else {
+      return null;
     }
   }
 }
