@@ -1,6 +1,5 @@
 package com.ramusthastudio.zodiakbot.util;
 
-import com.google.gson.Gson;
 import com.linecorp.bot.client.LineMessagingService;
 import com.linecorp.bot.client.LineMessagingServiceBuilder;
 import com.linecorp.bot.model.Multicast;
@@ -15,7 +14,7 @@ import com.linecorp.bot.model.message.template.Template;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.ramusthastudio.zodiakbot.controller.CinemaService;
-import com.ramusthastudio.zodiakbot.model.CinemaResult;
+import com.ramusthastudio.zodiakbot.model.Result;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.util.ArrayList;
@@ -261,7 +260,7 @@ public final class BotHelper {
     return retrofit.create(CinemaService.class);
   }
 
-  public static Response<CinemaResult> getCinemaToday(String aBaseUrl, String aKey, String aCityId) throws IOException {
+  public static Response<Result> getCinemaToday(String aBaseUrl, String aKey, String aCityId) throws IOException {
     CinemaService service = createdService(aBaseUrl);
     return service.cinemaToday(aKey, aCityId).execute();
   }

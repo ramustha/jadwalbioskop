@@ -6,7 +6,7 @@ import java.util.List;
 public class Schedule {
   @SerializedName("bioskop")
   private Object theater;
-  @SerializedName("bioskop")
+  @SerializedName("jam")
   private List<Object> scheduleTimes = null;
   @SerializedName("harga")
   private Object price;

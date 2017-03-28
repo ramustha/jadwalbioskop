@@ -2,7 +2,7 @@ package com.ramusthastudio.zodiakbot.controller;
 
 import com.google.gson.Gson;
 import com.linecorp.bot.client.LineSignatureValidator;
-import com.ramusthastudio.zodiakbot.model.CinemaResult;
+import com.ramusthastudio.zodiakbot.model.Result;
 import com.ramusthastudio.zodiakbot.model.Data;
 import com.ramusthastudio.zodiakbot.model.Events;
 import com.ramusthastudio.zodiakbot.model.Message;
@@ -171,11 +171,11 @@ public class LineBotController {
               String cityCandidate = generateCinemaId(city);
               if (cityCandidate != null) {
                 LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
-                Response<CinemaResult> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+                Response<Result> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
                 LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
 
                 if (cinemaToday.isSuccessful()) {
-                  CinemaResult cinemaRes = cinemaToday.body();
+                  Result cinemaRes = cinemaToday.body();
                   LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
                   List<Data> dataCinema = cinemaRes.getCinemaDatas();

@@ -12,7 +12,7 @@ public class Data {
   private Object genre;
   @SerializedName("duration")
   private Object duration;
-  @SerializedName("status")
+  @SerializedName("jadwal")
   private List<Schedule> schedule = null;
 
   public Object getMovie() { return movie; }
