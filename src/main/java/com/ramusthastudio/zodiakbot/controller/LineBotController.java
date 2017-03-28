@@ -170,7 +170,7 @@ public class LineBotController {
               String city = text.substring(KEY_TODAY.length(), text.length()).trim();
               String cityCandidate = generateCinemaId(city);
               if (cityCandidate != null) {
-                LOG.info("BioskopBaseUrl {} BioskopApiKey {}", fBioskopBaseUrl, fBioskopApiKey);
+                LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
                 Response<CinemaResult> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
                 LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
 

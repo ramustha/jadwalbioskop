@@ -1,5 +1,6 @@
 package com.ramusthastudio.zodiakbot.util;
 
+import com.google.gson.Gson;
 import com.linecorp.bot.client.LineMessagingService;
 import com.linecorp.bot.client.LineMessagingServiceBuilder;
 import com.linecorp.bot.model.Multicast;
