@@ -211,7 +211,7 @@ public final class BotHelper {
   public static void instructionTweetsMessage(String aChannelAccessToken, String aUserId) throws IOException {
     UserProfileResponse userProfile = getUserProfile(aChannelAccessToken, aUserId);
     String greeting = "Hi " + userProfile.getDisplayName() + "\n";
-    greeting += "Kamu tinggal tulis aja " + KEY_TODAY + ", di kota mana, contoh : " + KEY_TODAY + " Bandung";
+    greeting += "Kamu tinggal tulis aja " + KEY_TODAY + ", di kota mana contoh : " + KEY_TODAY + " Bandung";
     pushMessage(aChannelAccessToken, aUserId, greeting);
   }
 
