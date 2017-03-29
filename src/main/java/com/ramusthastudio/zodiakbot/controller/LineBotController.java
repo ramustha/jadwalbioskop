@@ -261,7 +261,7 @@ public class LineBotController {
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
             pushMessage(fChannelAccessToken, aUserId,
-                "\n" + "Judul :" + data.getMovie() +
+                "Judul :" + data.getMovie() +
                     "\n" + "Durasi :" + data.getDuration() +
                     "\n" + "Genre :" + data.getGenre() +
                     "\n" + "Overview :" +
@@ -299,7 +299,7 @@ public class LineBotController {
               Object theater = schedule.getTheater();
               Object price = schedule.getPrice();
               builder
-                  .append("\n").append("Bioskop : ").append(theater)
+                  .append("\n\n").append("Bioskop : ").append(theater)
                   .append("\n").append("Harga : ").append(price)
                   .append("\n").append("Jam : ");
               List<Object> scheduleTimes = schedule.getScheduleTimes();
@@ -307,8 +307,7 @@ public class LineBotController {
                 builder.append(time).append(" | ");
               }
             }
-            String text = builder.toString().substring(0, builder.toString().length() - 3);
-            pushMessage(fChannelAccessToken, aUserId, text);
+            pushMessage(fChannelAccessToken, aUserId, builder.toString());
           }
         }
       } else {
