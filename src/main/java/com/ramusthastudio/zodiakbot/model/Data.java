@@ -14,12 +14,16 @@ public class Data {
   private Object duration;
   @SerializedName("jadwal")
   private List<Schedule> schedule = null;
+  private String overview;
+  private double voteAverage;
 
   public Object getMovie() { return movie; }
   public Object getPoster() { return poster; }
   public Object getGenre() { return genre; }
   public Object getDuration() { return duration; }
   public List<Schedule> getSchedule() { return schedule; }
+  public String getOverview() { return overview; }
+  public double getVoteAverage() { return voteAverage; }
 
   public Data setMovie(Object aMovie) {
     movie = aMovie;
@@ -41,6 +45,14 @@ public class Data {
     schedule = aSchedule;
     return this;
   }
+  public Data setOverview(String aOverview) {
+    overview = aOverview;
+    return this;
+  }
+  public Data setVoteAverage(double aVoteAverage) {
+    voteAverage = aVoteAverage;
+    return this;
+  }
 
   @Override public String toString() {
     return "Data{" +
@@ -49,6 +61,8 @@ public class Data {
         ", genre=" + genre +
         ", duration=" + duration +
         ", schedule=" + schedule +
+        ", overview='" + overview + '\'' +
+        ", voteAverage=" + voteAverage +
         '}';
   }
 }

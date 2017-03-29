@@ -9,18 +9,22 @@ import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TemplateMessage;
 import com.linecorp.bot.model.message.TextMessage;
+import com.linecorp.bot.model.message.template.CarouselColumn;
+import com.linecorp.bot.model.message.template.CarouselTemplate;
 import com.linecorp.bot.model.message.template.ConfirmTemplate;
 import com.linecorp.bot.model.message.template.Template;
 import com.linecorp.bot.model.profile.UserProfileResponse;
 import com.linecorp.bot.model.response.BotApiResponse;
 import com.ramusthastudio.zodiakbot.controller.CinemaService;
 import com.ramusthastudio.zodiakbot.controller.MovieDbService;
+import com.ramusthastudio.zodiakbot.model.Data;
 import com.ramusthastudio.zodiakbot.model.DiscoverMovies;
 import com.ramusthastudio.zodiakbot.model.Result;
 import java.io.IOException;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -65,6 +69,8 @@ public final class BotHelper {
   public static final String MESSAGE_STICKER = "sticker";
 
   public static final String KEY_TODAY = "hari ini";
+  public static final String KEY_OVERVIEW = "sinopsis";
+  public static final String KEY_HELP = "panduan";
   public static final String IMG_HOLDER = "https://lh6.googleusercontent.com/E0VKf6AlrQ7LK3TA8Pcqyoh8c74icxKl64HohlBrLKeSW5XBsdfVyFy8ssAg4FNQY67wROqDBNPHZfc=w1920-h905";
 
   private static LineMessagingService lineServiceBuilder(String aChannelAccessToken) {
@@ -155,6 +161,68 @@ public final class BotHelper {
     PushMessage pushMessage = new PushMessage(aUserId, message);
     LOG.info("stickerMessage...");
     return lineServiceBuilder(aChannelAccessToken).pushMessage(pushMessage).execute();
+  }
+
+  public static Response<BotApiResponse> carouselMessage(String aChannelAccessToken, String aUserId,
+      Result aCinema, List<Data> aResultMovies, int aStart, int aEnd) throws IOException {
+    List<CarouselColumn> carouselColumn = buildCarouselColumn(aCinema, aResultMovies, aStart, aEnd);
+    CarouselTemplate template = new CarouselTemplate(carouselColumn);
+    return templateMessage(aChannelAccessToken, aUserId, template);
+  }
+
+  public static List<CarouselColumn> buildCarouselColumn(Result aCinema, List<Data> aResultMovies, int aStart, int aEnd) {
+    List<CarouselColumn> carouselColumn = new ArrayList<>();
+    List<Data> resultMovies = aResultMovies.subList(aStart, aEnd);
+
+    for (Data movies : resultMovies) {
+      String title = createTitle(movies.getMovie().toString());
+      String genre = createTagline(movies.getGenre().toString());
+      String poster = movies.getPoster().toString();
+
+      LOG.info("ResultMovies city {}\n date {}\n poster {}\n genre {}\n",
+          aCinema.getCity(), aCinema.getDate(), poster, genre);
+
+      carouselColumn.add(
+          new CarouselColumn(
+              movies.getPoster().toString(),
+              title + " (" + movies.getVoteAverage() + ")",
+              genre,
+              Collections.singletonList(
+                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + movies.getMovie()))));
+    }
+
+    return carouselColumn;
+  }
+
+  public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
+      int aStart, int aEnd) throws IOException {
+    String data = KEY_TODAY + " " + aStart + " " + aEnd;
+
+    ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?", Arrays.asList(
+        new PostbackAction("Ya", data),
+        new PostbackAction("Panduan", KEY_HELP)));
+
+    return templateMessage(aChannelAccessToken, aUserId, template);
+  }
+
+  public static String createTitle(String aTitle) {
+    String filterTitle;
+    if (aTitle.length() > 30) {
+      filterTitle = aTitle.substring(0, 30) + "...";
+    } else {
+      filterTitle = aTitle;
+    }
+    return filterTitle;
+  }
+
+  public static String createTagline(String aTagline) {
+    String filterTitle;
+    if (aTagline.length() > 55) {
+      filterTitle = aTagline.substring(0, 55) + "...";
+    } else {
+      filterTitle = aTagline;
+    }
+    return filterTitle;
   }
 
   // public static Response<BotApiResponse> profileUserMessage(String aChannelAccessToken, String aUserId, User aUser) throws IOException {

@@ -2,13 +2,13 @@ package com.ramusthastudio.zodiakbot.controller;
 
 import com.google.gson.Gson;
 import com.linecorp.bot.client.LineSignatureValidator;
-import com.ramusthastudio.zodiakbot.model.DiscoverMovies;
-import com.ramusthastudio.zodiakbot.model.Result;
 import com.ramusthastudio.zodiakbot.model.Data;
+import com.ramusthastudio.zodiakbot.model.DiscoverMovies;
 import com.ramusthastudio.zodiakbot.model.Events;
 import com.ramusthastudio.zodiakbot.model.Message;
 import com.ramusthastudio.zodiakbot.model.Payload;
 import com.ramusthastudio.zodiakbot.model.Postback;
+import com.ramusthastudio.zodiakbot.model.Result;
 import com.ramusthastudio.zodiakbot.model.ResultMovies;
 import com.ramusthastudio.zodiakbot.model.Source;
 import java.io.IOException;
@@ -30,6 +30,8 @@ import retrofit2.Response;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.FOLLOW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.IMG_HOLDER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.JOIN;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_HELP;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_OVERVIEW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.LEAVE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE;
@@ -39,6 +41,8 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_GROUP;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_ROOM;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_USER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.UNFOLLOW;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.carouselMessage;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.confirmMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.getCinemaToday;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.getSearchMovies;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessage;
@@ -196,18 +200,22 @@ public class LineBotController {
                         ResultMovies movie = moviesRes.get(0);
                         String coverUrl;
                         if (movie.getBackdropPath() != null) {
-                          coverUrl = movie.getBackdropPath();
-                        }else {
+                          coverUrl = fTheMovieBaseImgUrl + movie.getBackdropPath();
+                        } else {
                           coverUrl = IMG_HOLDER;
                         }
                         data.setPoster(coverUrl);
+                        data.setOverview(movie.getOverview());
+                        data.setVoteAverage(movie.getVoteAverage());
                         newCinema.add(data);
                       }
                     }
                     LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
                   }
-                  for (Data data : newCinema) {
-                    LOG.info("new Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
+                  if (newCinema.size() > 4) {
+                    buildMessage(cinemaRes, newCinema, aUserId, 0, 4);
+                  } else {
+                    buildMessage(cinemaRes, newCinema, aUserId, 0, newCinema.size());
                   }
                 } else {
                   pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
@@ -221,9 +229,34 @@ public class LineBotController {
           }
           break;
         case POSTBACK:
+          String text = aPostback.data();
+          if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+            String end = text.substring(KEY_TODAY.length(), text.length()).trim();
+
+            LOG.info("Start range {}", end);
+          } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
+            String sinopsis = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
+
+            LOG.info("Sinopsis {}", sinopsis);
+          } else if (text.toLowerCase().startsWith(KEY_HELP.toLowerCase())) {
+            LOG.info("Panduan");
+          }
           break;
       }
     } catch (IOException aE) { LOG.error("Message {}", aE.getMessage()); }
   }
-
+  private void buildMessage(Result aCinema, List<Data> aDataMovies, String aUserId, int aStart, int aEnd) throws IOException {
+    int size = aDataMovies.size();
+    if (size != 0) {
+      LOG.info("buildMessage range  {} - {}", aStart, aEnd);
+      carouselMessage(fChannelAccessToken, aUserId, aCinema, aDataMovies, aStart, aEnd);
+      int start = aEnd;
+      int end = start + 5;
+      if (aEnd < size) {
+        confirmMessage(fChannelAccessToken, aUserId, start, end);
+      }
+    } else {
+      pushMessage(fChannelAccessToken, aUserId, "Gak ada datanya nih...\ncoba ulangi");
+    }
+  }
 }
