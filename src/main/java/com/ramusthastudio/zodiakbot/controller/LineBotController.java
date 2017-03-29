@@ -422,8 +422,8 @@ public class LineBotController {
               }
             }
             pushMessage(fChannelAccessToken, aUserId, builder1.toString());
-            pushMessage(fChannelAccessToken, aUserId, builder2.toString());
-            pushMessage(fChannelAccessToken, aUserId, builder3.toString());
+            pushMessage(fChannelAccessToken, aUserId, builder2.toString().trim());
+            pushMessage(fChannelAccessToken, aUserId, builder3.toString().trim());
           }
         }
       } else {
@@ -448,7 +448,7 @@ public class LineBotController {
       }
     } else if (aBuilder2.length() < 1900) {
       aBuilder2
-          .append("\n").append("Bioskop : ").append(theater)
+          .append("\n\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
@@ -457,7 +457,7 @@ public class LineBotController {
       }
     } else {
       aBuilder3
-          .append("\n").append("Bioskop : ").append(theater)
+          .append("\n\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
