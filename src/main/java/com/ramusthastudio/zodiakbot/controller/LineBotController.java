@@ -102,37 +102,51 @@ public class LineBotController {
     LOG.info("The Signature is: {} ", valid ? "valid" : "tidak valid");
 
     LOG.info("Start getting payload ");
+
+    boolean isValid = false;
+    Gson gson = new Gson();
+    Payload payload = gson.fromJson(aPayload, Payload.class);
+    Events event = payload.events()[0];
+
+    String eventType = event.type();
+    String replayToken = event.replyToken();
+    Source source = event.source();
+    long timestamp = event.timestamp();
+    Message message = event.message();
+    Postback postback = event.postback();
+
+    String userId = source.userId();
+    String sourceType = source.type();
     try {
-
-      Gson gson = new Gson();
-      Payload payload = gson.fromJson(aPayload, Payload.class);
-      Events event = payload.events()[0];
-
-      String eventType = event.type();
-      String replayToken = event.replyToken();
-      Source source = event.source();
-      long timestamp = event.timestamp();
-      Message message = event.message();
-      Postback postback = event.postback();
-
-      String userId = source.userId();
-      String sourceType = source.type();
-
       LOG.info("source type : {} ", sourceType);
       switch (sourceType) {
         case SOURCE_USER:
           sourceUserProccess(eventType, replayToken, timestamp, message, postback, userId);
+          isValid = true;
           break;
         case SOURCE_GROUP:
-          // sourceGroupProccess(eventType, replayToken, postback, message, source);
+          sourceGroupProccess(eventType, replayToken, postback, message, source);
+          isValid = true;
           break;
         case SOURCE_ROOM:
           // sourceGroupProccess(eventType, replayToken, postback, message, source);
+          isValid = true;
           break;
       }
     } catch (Exception ae) {
       LOG.error("Error process payload : {} ", ae.getMessage());
     }
+
+    if (!isValid) {
+      try {
+        if (userId.length() > 5) {
+          pushMessage(fChannelAccessToken, userId, "Coba lagi yah beberapa saat, server aku ada masalah kayaknya");
+        } else {
+          pushMessage(fChannelAccessToken, source.groupId(), "Coba lagi yah beberapa saat, server aku ada masalah kayaknya");
+        }
+      } catch (IOException ignored) { }
+    }
+
     return new ResponseEntity<>(HttpStatus.OK);
   }
   private void sourceGroupProccess(String aEventType, String aReplayToken, Postback aPostback, Message aMessage, Source aSource) {
@@ -149,14 +163,78 @@ public class LineBotController {
         case MESSAGE:
           if (aMessage.type().equals(MESSAGE_TEXT)) {
             String text = aMessage.text();
-            replayMessage(fChannelAccessToken, aReplayToken, text);
-
-          } else {
-            pushMessage(fChannelAccessToken, aSource.groupId(), "Aku gak ngerti nih, " +
-                "aku ini cuma bot yang bisa membaca ramalan zodiak, jadi jangan tanya yang aneh aneh dulu yah");
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
+            if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+              String today = text.substring(KEY_TODAY.length(), text.length()).trim();
+              String[] candidats = today.split(",");
+              if (candidats.length == 1) {
+                String city = candidats[0].trim();
+                processMovies(aSource.groupId(), city, null, 0, 4);
+              } else {
+                String city = candidats[0].trim();
+                String cinema = candidats[1].trim();
+                processMovies(aSource.groupId(), city, cinema, 0, 4);
+              }
+            }
           }
           break;
         case POSTBACK:
+          String text = aPostback.data();
+          LOG.info("POSTBACK {}", text);
+          if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
+            String data = text.substring(KEY_TODAY.length(), text.length()).trim();
+            LOG.info("data {}", data);
+            String[] datas = data.split(",");
+            String city = datas[0].trim();
+            int start = Integer.parseInt(datas[1]);
+            int end = Integer.parseInt(datas[2]);
+
+            LOG.info("Start range {} {}", start, end);
+            processMovies(aSource.groupId(), city, null, start, end);
+          } else if (text.toLowerCase().startsWith(KEY_TODAY_FILTER.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
+            String data = text.substring(KEY_TODAY_FILTER.length(), text.length()).trim();
+            LOG.info("data {}", data);
+            String[] datas = data.split(",");
+            String city = datas[0].trim();
+            String filter = datas[1].trim();
+            int start = Integer.parseInt(datas[2]);
+            int end = Integer.parseInt(datas[3]);
+
+            LOG.info("Start filter {} range {} {}", filter, start, end);
+            processMovies(aSource.groupId(), city, filter, start, end);
+          } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
+            String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
+            LOG.info("data {}", data);
+            String[] datas = data.split(",");
+            String city = datas[0].trim();
+            String title = datas[1].trim();
+
+            LOG.info("Sinopsis city {} movie {}", city, title);
+            processOverviewMovies(aSource.groupId(), city, title);
+          } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
+            String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
+            LOG.info("data {}", data);
+            String[] datas = data.split(",");
+            if (datas.length > 2) {
+              String city = datas[0].trim();
+              String title = datas[1].trim();
+              String filter = datas[2].trim();
+              LOG.info("Jadwal city {} movie {} filter {}", city, title, filter);
+              processScheduleMovies(aSource.groupId(), city, filter, title);
+            } else {
+              String city = datas[0].trim();
+              String title = datas[1].trim();
+              LOG.info("Jadwal city {} movie {}", city, title);
+              processScheduleMovies(aSource.groupId(), city, null, title);
+            }
+          } else if (text.toLowerCase().startsWith(KEY_HELP.toLowerCase())) {
+            instructionTweetsMessage(fChannelAccessToken, aSource.groupId());
+            LOG.info("Panduan");
+          }
           break;
       }
     } catch (IOException aE) { LOG.error("Message {} couse {}", aE.getMessage(), aE.getCause()); }
@@ -198,6 +276,7 @@ public class LineBotController {
           String text = aPostback.data();
           LOG.info("POSTBACK {}", text);
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             String data = text.substring(KEY_TODAY.length(), text.length()).trim();
             LOG.info("data {}", data);
             String[] datas = data.split(",");
@@ -208,6 +287,7 @@ public class LineBotController {
             LOG.info("Start range {} {}", start, end);
             processMovies(aUserId, city, null, start, end);
           } else if (text.toLowerCase().startsWith(KEY_TODAY_FILTER.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             String data = text.substring(KEY_TODAY_FILTER.length(), text.length()).trim();
             LOG.info("data {}", data);
             String[] datas = data.split(",");
@@ -219,6 +299,7 @@ public class LineBotController {
             LOG.info("Start filter {} range {} {}", filter, start, end);
             processMovies(aUserId, city, filter, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
             LOG.info("data {}", data);
             String[] datas = data.split(",");
@@ -228,6 +309,7 @@ public class LineBotController {
             LOG.info("Sinopsis city {} movie {}", city, title);
             processOverviewMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
             LOG.info("data {}", data);
             String[] datas = data.split(",");
@@ -341,6 +423,7 @@ public class LineBotController {
             }
             pushMessage(fChannelAccessToken, aUserId, builder1.toString());
             pushMessage(fChannelAccessToken, aUserId, builder2.toString());
+            pushMessage(fChannelAccessToken, aUserId, builder3.toString());
           }
         }
       } else {
@@ -365,16 +448,16 @@ public class LineBotController {
       }
     } else if (aBuilder2.length() < 1900) {
       aBuilder2
-          .append("\n\n").append("Bioskop : ").append(theater)
+          .append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
       for (Object time : scheduleTimes) {
         aBuilder2.append(time).append(" | ");
       }
-    }else {
+    } else {
       aBuilder3
-          .append("\n\n").append("Bioskop : ").append(theater)
+          .append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
