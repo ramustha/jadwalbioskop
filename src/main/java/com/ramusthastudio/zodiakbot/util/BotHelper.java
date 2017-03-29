@@ -68,6 +68,7 @@ public final class BotHelper {
   public static final String MESSAGE_STICKER = "sticker";
 
   public static final String KEY_TODAY = "hari ini";
+  public static final String KEY_TODAY_FILTER = "hari ini filter";
   public static final String KEY_OVERVIEW = "sinopsis";
   public static final String KEY_SCHEDULE = "jadwal";
   public static final String KEY_HELP = "panduan";
@@ -197,8 +198,13 @@ public final class BotHelper {
   }
 
   public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
-      Result aCinema, int aStart, int aEnd) throws IOException {
-    String data = KEY_TODAY + " " + aCinema.getCity() + "," + aStart + "," + aEnd;
+      Result aCinema, String aFilter, int aStart, int aEnd) throws IOException {
+    String data;
+    if (aFilter != null) {
+      data = KEY_TODAY_FILTER + " " + aCinema.getCity() + "," + aStart + "," + aEnd;
+    } else {
+      data = KEY_TODAY + " " + aCinema.getCity() + "," + aStart + "," + aEnd;
+    }
 
     ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?",
         Arrays.asList(

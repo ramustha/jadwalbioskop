@@ -229,7 +229,7 @@ public class LineBotController {
     } catch (IOException aE) { LOG.error("Message {}", aE.getMessage()); }
   }
 
-  private void processMovies(String aUserId, String aCity, String aCinema, int aStart, int aEnd) throws IOException {
+  private void processMovies(String aUserId, String aCity, String aFilter, int aStart, int aEnd) throws IOException {
     String cityCandidate = generateCinemaId(aCity);
     if (cityCandidate != null) {
       LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
@@ -240,11 +240,11 @@ public class LineBotController {
         Result cinemaRes = cinemaToday.body();
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
-        List<Data> newCinema = buildDatas(cinemaRes, aCinema);
+        List<Data> newCinema = buildDatas(cinemaRes, aFilter);
         if (newCinema.size() > 4) {
-          buildMessage(cinemaRes, newCinema, aUserId, aStart, aEnd);
+          buildMessage(cinemaRes, newCinema, aFilter, aUserId, aStart, aEnd);
         } else {
-          buildMessage(cinemaRes, newCinema, aUserId, 0, newCinema.size());
+          buildMessage(cinemaRes, newCinema, aFilter, aUserId, 0, newCinema.size());
         }
       } else {
         pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
@@ -365,7 +365,9 @@ public class LineBotController {
         List<Schedule> schedules = data.getSchedule();
         for (Schedule schedule : schedules) {
           if (schedule.getTheater().toString().contains(aFilter)) {
-            newFilteredCinema.add(data);
+            if (!newFilteredCinema.contains(data)) {
+              newFilteredCinema.add(data);
+            }
           }
         }
       }
@@ -374,7 +376,7 @@ public class LineBotController {
     return newCinema;
   }
 
-  private void buildMessage(Result aCinema, List<Data> aDataMovies, String aUserId, int aStart, int aEnd) throws IOException {
+  private void buildMessage(Result aCinema, List<Data> aDataMovies, String aFilter, String aUserId, int aStart, int aEnd) throws IOException {
     int size = aDataMovies.size();
     int max = aEnd < size ? aEnd : size;
     if (size != 0) {
@@ -382,7 +384,7 @@ public class LineBotController {
       carouselMessage(fChannelAccessToken, aUserId, aCinema, aDataMovies, aStart, max);
       int end = aEnd + 5;
       if (aEnd < size) {
-        confirmMessage(fChannelAccessToken, aUserId, aCinema, aEnd, end);
+        confirmMessage(fChannelAccessToken, aUserId, aCinema, aFilter, aEnd, end);
       }
     } else {
       pushMessage(fChannelAccessToken, aUserId, "Gak ada datanya nih...\ncoba ulangi");
