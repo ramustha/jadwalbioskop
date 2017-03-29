@@ -69,7 +69,7 @@ public final class BotHelper {
   public static final String MESSAGE_STICKER = "sticker";
 
   public static final String KEY_TODAY = "hari ini";
-  public static final String KEY_TODAY_FILTER = "hari ini filter";
+  public static final String KEY_TODAY_FILTER = "filter";
   public static final String KEY_OVERVIEW = "sinopsis";
   public static final String KEY_SCHEDULE = "jadwal";
   public static final String KEY_HELP = "panduan";

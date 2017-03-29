@@ -196,6 +196,7 @@ public class LineBotController {
           break;
         case POSTBACK:
           String text = aPostback.data();
+          LOG.info("text {}", text);
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
             String data = text.substring(KEY_TODAY.length(), text.length()).trim();
             String[] datas = data.split(",");
