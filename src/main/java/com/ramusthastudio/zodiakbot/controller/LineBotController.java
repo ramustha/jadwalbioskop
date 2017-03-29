@@ -336,7 +336,7 @@ public class LineBotController {
               }
             } else {
               for (Schedule schedule : schedules) {
-                buildTheater(builder1, builder2, builder3 schedule);
+                buildTheater(builder1, builder2, builder3, schedule);
               }
             }
             pushMessage(fChannelAccessToken, aUserId, builder1.toString());
