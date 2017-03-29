@@ -207,6 +207,7 @@ public class LineBotController {
             processMovies(aUserId, city, null, start, end);
           } else if (text.toLowerCase().startsWith(KEY_TODAY_FILTER.toLowerCase())) {
             String data = text.substring(KEY_TODAY_FILTER.length(), text.length()).trim();
+            LOG.info("data {}", data);
             String[] datas = data.split(",");
             String city = datas[0].trim();
             String filter = datas[1].trim();
@@ -322,7 +323,7 @@ public class LineBotController {
             List<Schedule> schedules = data.getSchedule();
             if (aFilter != null) {
               for (Schedule schedule : schedules) {
-                if (schedule.getTheater().toString().equalsIgnoreCase(aFilter)) {
+                if (schedule.getTheater().toString().toLowerCase().contains(aFilter.toLowerCase())) {
                   buildTheater(builder, schedule);
                 }
               }
