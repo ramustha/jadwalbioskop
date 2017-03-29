@@ -131,7 +131,7 @@ public class LineBotController {
           break;
       }
     } catch (Exception ae) {
-      LOG.error("Erro process payload : {} ", ae.getMessage());
+      LOG.error("Error process payload : {} ", ae.getMessage());
     }
     return new ResponseEntity<>(HttpStatus.OK);
   }
@@ -196,9 +196,10 @@ public class LineBotController {
           break;
         case POSTBACK:
           String text = aPostback.data();
-          LOG.info("text {}", text);
+          LOG.info("POSTBACK {}", text);
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
             String data = text.substring(KEY_TODAY.length(), text.length()).trim();
+            LOG.info("data {}", data);
             String[] datas = data.split(",");
             String city = datas[0].trim();
             int start = Integer.parseInt(datas[1]);
@@ -219,6 +220,7 @@ public class LineBotController {
             processMovies(aUserId, city, filter, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
+            LOG.info("data {}", data);
             String[] datas = data.split(",");
             String city = datas[0].trim();
             String title = datas[1].trim();
@@ -227,6 +229,7 @@ public class LineBotController {
             processOverviewMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
+            LOG.info("data {}", data);
             String[] datas = data.split(",");
             String city = datas[0].trim();
             String title = datas[1].trim();
@@ -331,7 +334,6 @@ public class LineBotController {
             } else {
               for (Schedule schedule : schedules) {
                 buildTheater(builder, schedule);
-
               }
             }
             pushMessage(fChannelAccessToken, aUserId, builder.toString());
