@@ -189,7 +189,7 @@ public class LineBotController {
           String text = aPostback.data();
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
             String data = text.substring(KEY_TODAY.length(), text.length()).trim();
-            String[] datas = data.split(" ");
+            String[] datas = data.split(",");
             String city = datas[0];
             int start = Integer.parseInt(datas[1]);
             int end = Integer.parseInt(datas[2]);
@@ -198,7 +198,7 @@ public class LineBotController {
             processMovies(aUserId, city, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
-            String[] datas = data.split(" ");
+            String[] datas = data.split(",");
             String city = datas[0];
             String title = datas[1];
 
@@ -206,7 +206,7 @@ public class LineBotController {
             processOverviewMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
-            String[] datas = data.split(" ");
+            String[] datas = data.split(",");
             String city = datas[0];
             String title = datas[1];
 
@@ -261,8 +261,7 @@ public class LineBotController {
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
             pushMessage(fChannelAccessToken, aUserId,
-                aMovie +
-                    "\n" + "Judul :" + data.getMovie() +
+                "\n" + "Judul :" + data.getMovie() +
                     "\n" + "Durasi :" + data.getDuration() +
                     "\n" + "Genre :" + data.getGenre() +
                     "\n" + "Overview :" +
@@ -293,7 +292,7 @@ public class LineBotController {
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
             builder
-                .append("\n").append("Judul : ").append(data.getMovie())
+                .append("Judul : ").append(data.getMovie())
                 .append("\n").append("Genre : ").append(data.getGenre());
             List<Schedule> schedules = data.getSchedule();
             for (Schedule schedule : schedules) {
@@ -305,11 +304,11 @@ public class LineBotController {
                   .append("\n").append("Jam : ");
               List<Object> scheduleTimes = schedule.getScheduleTimes();
               for (Object time : scheduleTimes) {
-                builder
-                    .append("\n").append(time);
+                builder.append(time).append(" | ");
               }
             }
-            pushMessage(fChannelAccessToken, aUserId, builder.toString());
+            String text = builder.toString().substring(0, builder.toString().length() - 3);
+            pushMessage(fChannelAccessToken, aUserId, text);
           }
         }
       } else {

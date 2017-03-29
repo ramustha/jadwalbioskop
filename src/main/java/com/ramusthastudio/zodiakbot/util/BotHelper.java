@@ -71,7 +71,7 @@ public final class BotHelper {
   public static final String KEY_OVERVIEW = "sinopsis";
   public static final String KEY_SCHEDULE = "jadwal";
   public static final String KEY_HELP = "panduan";
-  public static final String IMG_HOLDER = "https://lh6.googleusercontent.com/E0VKf6AlrQ7LK3TA8Pcqyoh8c74icxKl64HohlBrLKeSW5XBsdfVyFy8ssAg4FNQY67wROqDBNPHZfc=w1920-h905";
+  public static final String IMG_HOLDER = "http://i1181.photobucket.com/albums/x435/Ramustha/jadwal%20bioskop_1.png";
 
   private static LineMessagingService lineServiceBuilder(String aChannelAccessToken) {
     OkHttpClient.Builder client = new OkHttpClient.Builder()
@@ -188,8 +188,8 @@ public final class BotHelper {
               title + " (" + movies.getVoteAverage() + ")",
               desc,
               Arrays.asList(
-                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + " " + movies.getMovie()),
-                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + " " + movies.getMovie())
+                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + ", " + movies.getMovie()),
+                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + ", " + movies.getMovie())
               )));
     }
 
@@ -198,7 +198,7 @@ public final class BotHelper {
 
   public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
       Result aCinema, int aStart, int aEnd) throws IOException {
-    String data = KEY_TODAY + " " + aCinema.getCity() + " " + aStart + " " + aEnd;
+    String data = KEY_TODAY + " " + aCinema.getCity() + ", " + aStart + ", " + aEnd;
 
     ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?",
         Arrays.asList(
