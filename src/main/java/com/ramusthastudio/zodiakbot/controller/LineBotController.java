@@ -32,6 +32,7 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.IMG_HOLDER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.JOIN;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_HELP;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_OVERVIEW;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_SCHEDULE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.LEAVE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE;
@@ -174,55 +175,10 @@ public class LineBotController {
         case MESSAGE:
           if (aMessage.type().equals(MESSAGE_TEXT)) {
             String text = aMessage.text();
-            replayMessage(fChannelAccessToken, aReplayToken, text);
+            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
               String city = text.substring(KEY_TODAY.length(), text.length()).trim();
-              String cityCandidate = generateCinemaId(city);
-              if (cityCandidate != null) {
-                LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
-                Response<Result> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
-                LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
-
-                if (cinemaToday.isSuccessful()) {
-                  Result cinemaRes = cinemaToday.body();
-                  LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
-
-                  List<Data> dataCinema = cinemaRes.getCinemaDatas();
-                  List<Data> newCinema = new ArrayList<>();
-                  for (Data data : dataCinema) {
-                    String title = data.getMovie().toString();
-                    Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
-                    LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
-                    if (moviesDb.isSuccessful()) {
-                      DiscoverMovies moviesBody = moviesDb.body();
-                      List<ResultMovies> moviesRes = moviesBody.getResultMovies();
-                      if (moviesRes.size() != 0) {
-                        ResultMovies movie = moviesRes.get(0);
-                        String coverUrl;
-                        if (movie.getBackdropPath() != null) {
-                          coverUrl = fTheMovieBaseImgUrl + movie.getBackdropPath();
-                        } else {
-                          coverUrl = IMG_HOLDER;
-                        }
-                        data.setPoster(coverUrl);
-                        data.setOverview(movie.getOverview());
-                        data.setVoteAverage(movie.getVoteAverage());
-                        newCinema.add(data);
-                      }
-                    }
-                    LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
-                  }
-                  if (newCinema.size() > 4) {
-                    buildMessage(cinemaRes, newCinema, aUserId, 0, 4);
-                  } else {
-                    buildMessage(cinemaRes, newCinema, aUserId, 0, newCinema.size());
-                  }
-                } else {
-                  pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
-                }
-              } else {
-                pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
-              }
+              processMovies(aUserId, city, 0, 4);
             }
           } else {
             pushMessage(fChannelAccessToken, aUserId, "Aku gak ngerti nih, jangan tanya yang aneh aneh dulu yah");
@@ -231,13 +187,24 @@ public class LineBotController {
         case POSTBACK:
           String text = aPostback.data();
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
-            String end = text.substring(KEY_TODAY.length(), text.length()).trim();
+            String data = text.substring(KEY_TODAY.length(), text.length()).trim();
+            String[] datas = data.split(" ");
+            String city = datas[0];
+            int start = Integer.parseInt(datas[1]);
+            int end = Integer.parseInt(datas[2]);
 
-            LOG.info("Start range {}", end);
+            processMovies(aUserId, city, start, end);
+            LOG.info("Start range {} {}", start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String sinopsis = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
 
             LOG.info("Sinopsis {}", sinopsis);
+          } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
+            String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
+            String[] datas = data.split(" ");
+            String city = datas[0];
+            String title = datas[1];
+            LOG.info("Kota {} movie {}", city, title);
           } else if (text.toLowerCase().startsWith(KEY_HELP.toLowerCase())) {
             LOG.info("Panduan");
           }
@@ -245,6 +212,56 @@ public class LineBotController {
       }
     } catch (IOException aE) { LOG.error("Message {}", aE.getMessage()); }
   }
+
+  private void processMovies(String aUserId, String aCity, int aStart, int aEnd) throws IOException {
+    String cityCandidate = generateCinemaId(aCity);
+    if (cityCandidate != null) {
+      LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      Response<Result> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
+
+      if (cinemaToday.isSuccessful()) {
+        Result cinemaRes = cinemaToday.body();
+        LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
+
+        List<Data> dataCinema = cinemaRes.getCinemaDatas();
+        List<Data> newCinema = new ArrayList<>();
+        for (Data data : dataCinema) {
+          String title = data.getMovie().toString();
+          Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
+          LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
+          if (moviesDb.isSuccessful()) {
+            DiscoverMovies moviesBody = moviesDb.body();
+            List<ResultMovies> moviesRes = moviesBody.getResultMovies();
+            if (moviesRes.size() != 0) {
+              ResultMovies movie = moviesRes.get(0);
+              String coverUrl;
+              if (movie.getBackdropPath() != null) {
+                coverUrl = fTheMovieBaseImgUrl + movie.getBackdropPath();
+              } else {
+                coverUrl = IMG_HOLDER;
+              }
+              data.setPoster(coverUrl);
+              data.setOverview(movie.getOverview());
+              data.setVoteAverage(movie.getVoteAverage());
+              newCinema.add(data);
+            }
+          }
+          LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
+        }
+        if (newCinema.size() > 4) {
+          buildMessage(cinemaRes, newCinema, aUserId, aStart, aEnd);
+        } else {
+          buildMessage(cinemaRes, newCinema, aUserId, 0, newCinema.size());
+        }
+      } else {
+        pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
+      }
+    } else {
+      pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
+    }
+  }
+
   private void buildMessage(Result aCinema, List<Data> aDataMovies, String aUserId, int aStart, int aEnd) throws IOException {
     int size = aDataMovies.size();
     if (size != 0) {
@@ -253,7 +270,7 @@ public class LineBotController {
       int start = aEnd;
       int end = start + 5;
       if (aEnd < size) {
-        confirmMessage(fChannelAccessToken, aUserId, start, end);
+        confirmMessage(fChannelAccessToken, aUserId, aCinema, start, end);
       }
     } else {
       pushMessage(fChannelAccessToken, aUserId, "Gak ada datanya nih...\ncoba ulangi");

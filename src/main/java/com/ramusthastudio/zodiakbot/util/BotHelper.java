@@ -24,7 +24,6 @@ import java.io.IOException;
 import java.security.KeyStore;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
@@ -70,6 +69,7 @@ public final class BotHelper {
 
   public static final String KEY_TODAY = "hari ini";
   public static final String KEY_OVERVIEW = "sinopsis";
+  public static final String KEY_SCHEDULE = "jadwal";
   public static final String KEY_HELP = "panduan";
   public static final String IMG_HOLDER = "https://lh6.googleusercontent.com/E0VKf6AlrQ7LK3TA8Pcqyoh8c74icxKl64HohlBrLKeSW5XBsdfVyFy8ssAg4FNQY67wROqDBNPHZfc=w1920-h905";
 
@@ -176,31 +176,34 @@ public final class BotHelper {
 
     for (Data movies : resultMovies) {
       String title = createTitle(movies.getMovie().toString());
-      String genre = createTagline(movies.getGenre().toString());
+      String desc = createTagline(aCinema.getDate() + "\n" + movies.getGenre().toString());
       String poster = movies.getPoster().toString();
 
       LOG.info("ResultMovies city {}\n date {}\n poster {}\n genre {}\n",
-          aCinema.getCity(), aCinema.getDate(), poster, genre);
+          aCinema.getCity(), aCinema.getDate(), poster, desc);
 
       carouselColumn.add(
           new CarouselColumn(
               movies.getPoster().toString(),
               title + " (" + movies.getVoteAverage() + ")",
-              genre,
-              Collections.singletonList(
-                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + movies.getMovie()))));
+              desc,
+              Arrays.asList(
+                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + " " + movies.getMovie()),
+                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + " " + movies.getMovie())
+              )));
     }
 
     return carouselColumn;
   }
 
   public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
-      int aStart, int aEnd) throws IOException {
-    String data = KEY_TODAY + " " + aStart + " " + aEnd;
+      Result aCinema, int aStart, int aEnd) throws IOException {
+    String data = KEY_TODAY + " " + aCinema.getCity() + " " + aStart + " " + aEnd;
 
-    ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?", Arrays.asList(
-        new PostbackAction("Ya", data),
-        new PostbackAction("Panduan", KEY_HELP)));
+    ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?",
+        Arrays.asList(
+            new PostbackAction("Ya", data),
+            new PostbackAction("Panduan", KEY_HELP)));
 
     return templateMessage(aChannelAccessToken, aUserId, template);
   }
