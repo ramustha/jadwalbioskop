@@ -198,7 +198,7 @@ public final class BotHelper {
 
   public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
       Result aCinema, int aStart, int aEnd) throws IOException {
-    String data = KEY_TODAY + " " + aCinema.getCity() + ", " + aStart + ", " + aEnd;
+    String data = KEY_TODAY + " " + aCinema.getCity() + " " + aStart + " " + aEnd;
 
     ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?",
         Arrays.asList(

@@ -189,7 +189,7 @@ public class LineBotController {
           String text = aPostback.data();
           if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
             String data = text.substring(KEY_TODAY.length(), text.length()).trim();
-            String[] datas = data.split(",");
+            String[] datas = data.split(" ");
             String city = datas[0];
             int start = Integer.parseInt(datas[1]);
             int end = Integer.parseInt(datas[2]);
