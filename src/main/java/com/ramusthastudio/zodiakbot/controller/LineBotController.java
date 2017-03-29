@@ -159,7 +159,7 @@ public class LineBotController {
         case POSTBACK:
           break;
       }
-    } catch (IOException aE) { LOG.error("Message {}", aE.getMessage()); }
+    } catch (IOException aE) { LOG.error("Message {} couse {}", aE.getMessage(), aE.getCause()); }
   }
 
   private void sourceUserProccess(String aEventType, String aReplayToken, long aTimestamp, Message aMessage, Postback aPostback, String aUserId) {
@@ -231,14 +231,15 @@ public class LineBotController {
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
             LOG.info("data {}", data);
             String[] datas = data.split(",");
-            String city = datas[0].trim();
-            String title = datas[1].trim();
-
-            if (datas[2] != null) {
+            if (datas.length > 2) {
+              String city = datas[0].trim();
+              String title = datas[1].trim();
               String filter = datas[2].trim();
               LOG.info("Jadwal city {} movie {} filter {}", city, title, filter);
               processScheduleMovies(aUserId, city, filter, title);
-            } else {
+            }else {
+              String city = datas[0].trim();
+              String title = datas[1].trim();
               LOG.info("Jadwal city {} movie {}", city, title);
               processScheduleMovies(aUserId, city, null, title);
             }
