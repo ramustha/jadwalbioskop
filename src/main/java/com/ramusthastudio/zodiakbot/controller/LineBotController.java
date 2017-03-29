@@ -12,6 +12,7 @@ import com.ramusthastudio.zodiakbot.model.Postback;
 import com.ramusthastudio.zodiakbot.model.ResultMovies;
 import com.ramusthastudio.zodiakbot.model.Source;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -183,6 +184,7 @@ public class LineBotController {
                   LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
                   List<Data> dataCinema = cinemaRes.getCinemaDatas();
+                  List<Data> newCinema = new ArrayList<>();
                   for (Data data : dataCinema) {
                     String title = data.getMovie().toString();
                     Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
@@ -199,12 +201,13 @@ public class LineBotController {
                           coverUrl = IMG_HOLDER;
                         }
                         data.setPoster(coverUrl);
+                        newCinema.add(data);
                       }
                     }
-                    LOG.info("Movie {} genre {} jadwal {}", data.getMovie(), data.getDuration(), data.getSchedule());
-                  }
-                  for (Data data : dataCinema) {
                     LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
+                  }
+                  for (Data data : newCinema) {
+                    LOG.info("new Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
                   }
                 } else {
                   pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
