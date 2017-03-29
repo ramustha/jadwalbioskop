@@ -5,6 +5,7 @@ import com.linecorp.bot.client.LineMessagingServiceBuilder;
 import com.linecorp.bot.model.Multicast;
 import com.linecorp.bot.model.PushMessage;
 import com.linecorp.bot.model.ReplyMessage;
+import com.linecorp.bot.model.action.Action;
 import com.linecorp.bot.model.action.PostbackAction;
 import com.linecorp.bot.model.message.StickerMessage;
 import com.linecorp.bot.model.message.TemplateMessage;
@@ -165,13 +166,13 @@ public final class BotHelper {
   }
 
   public static Response<BotApiResponse> carouselMessage(String aChannelAccessToken, String aUserId,
-      Result aCinema, List<Data> aResultMovies, int aStart, int aEnd) throws IOException {
-    List<CarouselColumn> carouselColumn = buildCarouselColumn(aCinema, aResultMovies, aStart, aEnd);
+      Result aCinema, String aFilter, List<Data> aResultMovies, int aStart, int aEnd) throws IOException {
+    List<CarouselColumn> carouselColumn = buildCarouselColumn(aCinema, aFilter, aResultMovies, aStart, aEnd);
     CarouselTemplate template = new CarouselTemplate(carouselColumn);
     return templateMessage(aChannelAccessToken, aUserId, template);
   }
 
-  public static List<CarouselColumn> buildCarouselColumn(Result aCinema, List<Data> aResultMovies, int aStart, int aEnd) {
+  public static List<CarouselColumn> buildCarouselColumn(Result aCinema, String aFilter, List<Data> aResultMovies, int aStart, int aEnd) {
     List<CarouselColumn> carouselColumn = new ArrayList<>();
     List<Data> resultMovies = aResultMovies.subList(aStart, aEnd);
 
@@ -183,15 +184,25 @@ public final class BotHelper {
       LOG.info("ResultMovies city {}\n date {}\n poster {}\n genre {}\n",
           aCinema.getCity(), aCinema.getDate(), poster, desc);
 
+      List<Action> buttons;
+      if (aFilter != null) {
+        buttons = Arrays.asList(
+            new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + "," + movies.getMovie() + "," + aFilter),
+            new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + "," + movies.getMovie() + "," + aFilter)
+        );
+      } else {
+        buttons = Arrays.asList(
+            new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + "," + movies.getMovie()),
+            new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + "," + movies.getMovie())
+        );
+      }
       carouselColumn.add(
           new CarouselColumn(
               movies.getPoster().toString(),
               title + " (" + movies.getVoteAverage() + ")",
               desc,
-              Arrays.asList(
-                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + "," + movies.getMovie()),
-                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + "," + movies.getMovie())
-              )));
+              buttons
+          ));
     }
 
     return carouselColumn;
