@@ -188,8 +188,8 @@ public final class BotHelper {
               title + " (" + movies.getVoteAverage() + ")",
               desc,
               Arrays.asList(
-                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + ", " + movies.getMovie()),
-                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + ", " + movies.getMovie())
+                  new PostbackAction("Sinopsis ", KEY_OVERVIEW + " " + aCinema.getCity() + "," + movies.getMovie()),
+                  new PostbackAction("Jadwal ", KEY_SCHEDULE + " " + aCinema.getCity() + "," + movies.getMovie())
               )));
     }
 

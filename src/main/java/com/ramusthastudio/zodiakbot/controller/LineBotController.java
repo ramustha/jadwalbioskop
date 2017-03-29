@@ -199,16 +199,16 @@ public class LineBotController {
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
             String[] datas = data.split(",");
-            String city = datas[0];
-            String title = datas[1];
+            String city = datas[0].trim();
+            String title = datas[1].trim();
 
             LOG.info("Sinopsis city {} movie {}", city, title);
             processOverviewMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
             String[] datas = data.split(",");
-            String city = datas[0];
-            String title = datas[1];
+            String city = datas[0].trim();
+            String title = datas[1].trim();
 
             LOG.info("Jadwal city {} movie {}", city, title);
             processScheduleMovies(aUserId, city, title);
