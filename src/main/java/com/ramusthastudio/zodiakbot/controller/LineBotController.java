@@ -159,11 +159,11 @@ public class LineBotController {
         case JOIN:
           LOG.info("Greeting Message");
           greetingMessageGroup(fChannelAccessToken, aSource.groupId());
+          instructionTweetsMessage(fChannelAccessToken, aSource.groupId());
           break;
         case MESSAGE:
           if (aMessage.type().equals(MESSAGE_TEXT)) {
             String text = aMessage.text();
-            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
               String today = text.substring(KEY_TODAY.length(), text.length()).trim();
               String[] candidats = today.split(",");
@@ -448,7 +448,7 @@ public class LineBotController {
       }
     } else if (aBuilder2.length() < 1900) {
       aBuilder2
-          .append("Bioskop : ").append(theater)
+          .append("\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
@@ -457,7 +457,7 @@ public class LineBotController {
       }
     } else {
       aBuilder3
-          .append("Bioskop : ").append(theater)
+          .append("\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
           .append("\n").append("| ");
       List<Object> scheduleTimes = schedule.getScheduleTimes();
