@@ -71,7 +71,7 @@ public final class BotHelper {
   public static final String KEY_OVERVIEW = "sinopsis";
   public static final String KEY_SCHEDULE = "jadwal";
   public static final String KEY_HELP = "panduan";
-  public static final String IMG_HOLDER = "http://i1181.photobucket.com/albums/x435/Ramustha/jadwal%20bioskop_1.png";
+  public static final String IMG_HOLDER = "https://drive.google.com/file/d/0B-F-b_ahxeRqSEJfd3VsSVNSYVk/view";
 
   private static LineMessagingService lineServiceBuilder(String aChannelAccessToken) {
     OkHttpClient.Builder client = new OkHttpClient.Builder()
@@ -198,7 +198,7 @@ public final class BotHelper {
 
   public static Response<BotApiResponse> confirmMessage(String aChannelAccessToken, String aUserId,
       Result aCinema, int aStart, int aEnd) throws IOException {
-    String data = KEY_TODAY + " " + aCinema.getCity() + " " + aStart + " " + aEnd;
+    String data = KEY_TODAY + " " + aCinema.getCity() + ", " + aStart + ", " + aEnd;
 
     ConfirmTemplate template = new ConfirmTemplate("Lihat yang lain ?",
         Arrays.asList(

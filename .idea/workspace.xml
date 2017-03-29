@@ -3,6 +3,7 @@
   <component name="ChangeListManager">
     <list default="true" id="36aca960-cd82-4a96-9ff8-78704b4ed36d" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/controller/LineBotController.java" afterPath="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/controller/LineBotController.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java" afterPath="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java" />
     </list>
     <ignored path="$PROJECT_DIR$/.gradle/" />
     <ignored path="$PROJECT_DIR$/build/" />
@@ -78,14 +79,14 @@
     </system>
   </component>
   <component name="FileEditorManager">
-    <splitter split-orientation="horizontal" split-proportion="0.70813066">
+    <splitter split-orientation="horizontal" split-proportion="0.4649062">
       <split-first>
         <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
           <file leaf-file-name="LineBotController.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/controller/LineBotController.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="237">
-                  <caret line="359" column="28" lean-forward="false" selection-start-line="359" selection-start-column="16" selection-end-line="359" selection-end-column="28" />
+                <state relative-caret-position="169">
+                  <caret line="193" column="51" lean-forward="true" selection-start-line="193" selection-start-column="51" selection-end-line="193" selection-end-column="51" />
                   <folding>
                     <element signature="imports" expanded="true" />
                   </folding>
@@ -140,8 +141,8 @@
           <file leaf-file-name="BotHelper.java" pinned="false" current-in-tab="true">
             <entry file="file://$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java">
               <provider selected="true" editor-type-id="text-editor">
-                <state relative-caret-position="211">
-                  <caret line="200" column="74" lean-forward="false" selection-start-line="200" selection-start-column="74" selection-end-line="200" selection-end-column="74" />
+                <state relative-caret-position="48">
+                  <caret line="73" column="108" lean-forward="false" selection-start-line="73" selection-start-column="108" selection-end-line="73" selection-end-column="108" />
                   <folding />
                 </state>
               </provider>
@@ -581,8 +582,8 @@
         <option value="$PROJECT_DIR$/src/main/resources/application.properties" />
         <option value="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/model/FindMovies.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/model/Data.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/controller/LineBotController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java" />
       </list>
     </option>
   </component>
@@ -1273,12 +1274,12 @@
       <workItem from="1490697422302" duration="98000" />
       <workItem from="1490697527450" duration="781000" />
       <workItem from="1490698343342" duration="10733000" />
-      <workItem from="1490757622162" duration="13809000" />
+      <workItem from="1490757622162" duration="14091000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="25816000" />
+    <option name="totallyTimeSpent" value="26098000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-9" y="-9" width="1620" height="920" extended-state="0" />
@@ -1560,14 +1561,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.linecorp.bot/line-bot-model/1.6.0/361eee031c7f7a2009ff5bbc3c1d61a80f149940/line-bot-model-1.6.0-sources.jar!/com/linecorp/bot/model/message/template/CarouselColumn.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="547">
-          <caret line="63" column="11" lean-forward="false" selection-start-line="63" selection-start-column="11" selection-end-line="63" selection-end-column="11" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.linecorp.bot/line-bot-model/1.6.0/361eee031c7f7a2009ff5bbc3c1d61a80f149940/line-bot-model-1.6.0-sources.jar!/com/linecorp/bot/model/action/PostbackAction.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="486">
@@ -1579,21 +1572,37 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java">
+    <entry file="jar://C:/Program Files/Java/jdk1.8.0_72/src.zip!/java/util/Arrays.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="211">
-          <caret line="200" column="74" lean-forward="false" selection-start-line="200" selection-start-column="74" selection-end-line="200" selection-end-column="74" />
+        <state relative-caret-position="161">
+          <caret line="70" column="13" lean-forward="false" selection-start-line="70" selection-start-column="13" selection-end-line="70" selection-end-column="13" />
           <folding />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/controller/LineBotController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="237">
-          <caret line="359" column="28" lean-forward="false" selection-start-line="359" selection-start-column="16" selection-end-line="359" selection-end-column="28" />
+        <state relative-caret-position="169">
+          <caret line="193" column="51" lean-forward="true" selection-start-line="193" selection-start-column="51" selection-end-line="193" selection-end-column="51" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="jar://$USER_HOME$/.gradle/caches/modules-2/files-2.1/com.linecorp.bot/line-bot-model/1.6.0/361eee031c7f7a2009ff5bbc3c1d61a80f149940/line-bot-model-1.6.0-sources.jar!/com/linecorp/bot/model/message/template/CarouselColumn.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="595">
+          <caret line="63" column="11" lean-forward="false" selection-start-line="63" selection-start-column="11" selection-end-line="63" selection-end-column="11" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/ramusthastudio/zodiakbot/util/BotHelper.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="48">
+          <caret line="73" column="108" lean-forward="false" selection-start-line="73" selection-start-column="108" selection-end-line="73" selection-end-column="108" />
+          <folding />
         </state>
       </provider>
     </entry>
