@@ -176,7 +176,7 @@ public final class BotHelper {
 
     for (Data movies : resultMovies) {
       String title = createTitle(movies.getMovie().toString());
-      String desc = createTagline(aCinema.getDate() + "\n" + movies.getGenre().toString());
+      String desc = createTagline(movies.getDuration() + "\n" + movies.getGenre().toString());
       String poster = movies.getPoster().toString();
 
       LOG.info("ResultMovies city {}\n date {}\n poster {}\n genre {}\n",

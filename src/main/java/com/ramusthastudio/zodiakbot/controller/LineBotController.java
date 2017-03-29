@@ -229,7 +229,7 @@ public class LineBotController {
         for (Data data : dataCinema) {
           String title = data.getMovie().toString();
           Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
-          LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
+          LOG.info("DiscoverMovies code {} message {} body {}", moviesDb.code(), moviesDb.message(), moviesDb.body());
           if (moviesDb.isSuccessful()) {
             DiscoverMovies moviesBody = moviesDb.body();
             List<ResultMovies> moviesRes = moviesBody.getResultMovies();
