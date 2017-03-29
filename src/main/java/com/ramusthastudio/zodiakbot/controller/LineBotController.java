@@ -237,7 +237,7 @@ public class LineBotController {
               String filter = datas[2].trim();
               LOG.info("Jadwal city {} movie {} filter {}", city, title, filter);
               processScheduleMovies(aUserId, city, filter, title);
-            }else {
+            } else {
               String city = datas[0].trim();
               String title = datas[1].trim();
               LOG.info("Jadwal city {} movie {}", city, title);
@@ -319,25 +319,27 @@ public class LineBotController {
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
         List<Data> newCinema = buildDatas(cinemaRes, null);
-        StringBuilder builder = new StringBuilder();
+        StringBuilder builder1 = new StringBuilder();
+        StringBuilder builder2 = new StringBuilder();
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
-            builder
+            builder1
                 .append("Judul : ").append(data.getMovie())
                 .append("\n").append("Genre : ").append(data.getGenre());
             List<Schedule> schedules = data.getSchedule();
             if (aFilter != null) {
               for (Schedule schedule : schedules) {
                 if (schedule.getTheater().toString().toLowerCase().contains(aFilter.toLowerCase())) {
-                  buildTheater(builder, schedule);
+                  buildTheater(builder1, builder2, schedule);
                 }
               }
             } else {
               for (Schedule schedule : schedules) {
-                buildTheater(builder, schedule);
+                buildTheater(builder1, builder2, schedule);
               }
             }
-            pushMessage(fChannelAccessToken, aUserId, builder.toString());
+            pushMessage(fChannelAccessToken, aUserId, builder1.toString());
+            pushMessage(fChannelAccessToken, aUserId, builder2.toString());
           }
         }
       } else {
@@ -348,16 +350,27 @@ public class LineBotController {
     }
   }
 
-  private static void buildTheater(StringBuilder aBuilder, Schedule schedule) {
+  private static void buildTheater(StringBuilder aBuilder1, StringBuilder aBuilder2, Schedule schedule) {
     Object theater = schedule.getTheater();
     Object price = schedule.getPrice();
-    aBuilder
-        .append("\n\n").append("Bioskop : ").append(theater)
-        .append("\n").append("Harga : ").append(price)
-        .append("\n").append("Jam : ");
-    List<Object> scheduleTimes = schedule.getScheduleTimes();
-    for (Object time : scheduleTimes) {
-      aBuilder.append(time).append(" | ");
+    if (aBuilder1.length() < 1000) {
+      aBuilder1
+          .append("\n\n").append("Bioskop : ").append(theater)
+          .append("\n").append("Harga : ").append(price)
+          .append("\n").append("| ");
+      List<Object> scheduleTimes = schedule.getScheduleTimes();
+      for (Object time : scheduleTimes) {
+        aBuilder1.append(time).append(" | ");
+      }
+    }else {
+      aBuilder2
+          .append("\n\n").append("Bioskop : ").append(theater)
+          .append("\n").append("Harga : ").append(price)
+          .append("\n").append("| ");
+      List<Object> scheduleTimes = schedule.getScheduleTimes();
+      for (Object time : scheduleTimes) {
+        aBuilder2.append(time).append(" | ");
+      }
     }
   }
 
