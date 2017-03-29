@@ -178,8 +178,16 @@ public class LineBotController {
             String text = aMessage.text();
             replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
-              String city = text.substring(KEY_TODAY.length(), text.length()).trim();
-              processMovies(aUserId, city, 0, 4);
+              String today = text.substring(KEY_TODAY.length(), text.length()).trim();
+              String[] candidats = today.split(",");
+              if (candidats.length == 1) {
+                String city = candidats[0];
+                processMovies(aUserId, city, null, 0, 4);
+              } else {
+                String city = candidats[0];
+                String cinema = candidats[1];
+                processMovies(aUserId, city, cinema, 0, 4);
+              }
             }
           } else {
             pushMessage(fChannelAccessToken, aUserId, "Aku gak ngerti nih, jangan tanya yang aneh aneh dulu yah");
@@ -195,7 +203,7 @@ public class LineBotController {
             int end = Integer.parseInt(datas[2]);
 
             LOG.info("Start range {} {}", start, end);
-            processMovies(aUserId, city, start, end);
+            processMovies(aUserId, city, null, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
             String[] datas = data.split(",");
@@ -221,7 +229,7 @@ public class LineBotController {
     } catch (IOException aE) { LOG.error("Message {}", aE.getMessage()); }
   }
 
-  private void processMovies(String aUserId, String aCity, int aStart, int aEnd) throws IOException {
+  private void processMovies(String aUserId, String aCity, String aCinema, int aStart, int aEnd) throws IOException {
     String cityCandidate = generateCinemaId(aCity);
     if (cityCandidate != null) {
       LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
@@ -232,7 +240,7 @@ public class LineBotController {
         Result cinemaRes = cinemaToday.body();
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
-        List<Data> newCinema = buildDatas(cinemaRes);
+        List<Data> newCinema = buildDatas(cinemaRes, aCinema);
         if (newCinema.size() > 4) {
           buildMessage(cinemaRes, newCinema, aUserId, aStart, aEnd);
         } else {
@@ -257,7 +265,7 @@ public class LineBotController {
         Result cinemaRes = cinemaToday.body();
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
-        List<Data> newCinema = buildDatas(cinemaRes);
+        List<Data> newCinema = buildDatas(cinemaRes, null);
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
             pushMessage(fChannelAccessToken, aUserId,
@@ -287,7 +295,7 @@ public class LineBotController {
         Result cinemaRes = cinemaToday.body();
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
-        List<Data> newCinema = buildDatas(cinemaRes);
+        List<Data> newCinema = buildDatas(cinemaRes, null);
         StringBuilder builder = new StringBuilder();
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
@@ -318,7 +326,7 @@ public class LineBotController {
     }
   }
 
-  private List<Data> buildDatas(Result aCinemaRes) throws IOException {
+  private List<Data> buildDatas(Result aCinemaRes, String aFilter) throws IOException {
     List<Data> dataCinema = aCinemaRes.getCinemaDatas();
     List<Data> newCinema = new ArrayList<>();
     for (Data data : dataCinema) {
@@ -348,6 +356,20 @@ public class LineBotController {
         }
       }
       LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
+    }
+
+    LOG.info("Filter");
+    if (aFilter != null) {
+      List<Data> newFilteredCinema = new ArrayList<>();
+      for (Data data : newCinema) {
+        List<Schedule> schedules = data.getSchedule();
+        for (Schedule schedule : schedules) {
+          if (schedule.getTheater().toString().contains(aFilter)) {
+            newFilteredCinema.add(data);
+          }
+        }
+      }
+      return newFilteredCinema;
     }
     return newCinema;
   }
