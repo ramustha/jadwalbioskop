@@ -264,13 +264,13 @@ public class LineBotController {
 
   private void buildMessage(Result aCinema, List<Data> aDataMovies, String aUserId, int aStart, int aEnd) throws IOException {
     int size = aDataMovies.size();
+    int max = aEnd < size ? aEnd : size;
     if (size != 0) {
-      LOG.info("buildMessage range  {} - {}", aStart, aEnd);
-      carouselMessage(fChannelAccessToken, aUserId, aCinema, aDataMovies, aStart, aEnd);
-      int start = aEnd;
-      int end = start + 5;
+      LOG.info("buildMessage range  {} - {}", aStart, max);
+      carouselMessage(fChannelAccessToken, aUserId, aCinema, aDataMovies, aStart, max);
+      int end = aEnd + 5;
       if (aEnd < size) {
-        confirmMessage(fChannelAccessToken, aUserId, aCinema, start, end);
+        confirmMessage(fChannelAccessToken, aUserId, aCinema, aEnd, end);
       }
     } else {
       pushMessage(fChannelAccessToken, aUserId, "Gak ada datanya nih...\ncoba ulangi");
