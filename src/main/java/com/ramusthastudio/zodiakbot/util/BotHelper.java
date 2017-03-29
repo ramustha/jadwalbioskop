@@ -201,7 +201,7 @@ public final class BotHelper {
       Result aCinema, String aFilter, int aStart, int aEnd) throws IOException {
     String data;
     if (aFilter != null) {
-      data = KEY_TODAY_FILTER + " " + aCinema.getCity() + "," + aStart + "," + aEnd;
+      data = KEY_TODAY_FILTER + " " + aCinema.getCity() + "," + aFilter + "," + aStart + "," + aEnd;
     } else {
       data = KEY_TODAY + " " + aCinema.getCity() + "," + aStart + "," + aEnd;
     }

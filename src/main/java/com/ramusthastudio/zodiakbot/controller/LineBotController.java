@@ -35,6 +35,7 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_HELP;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_OVERVIEW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_SCHEDULE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY_FILTER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.LEAVE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.MESSAGE_TEXT;
@@ -204,6 +205,16 @@ public class LineBotController {
 
             LOG.info("Start range {} {}", start, end);
             processMovies(aUserId, city, null, start, end);
+          } else if (text.toLowerCase().startsWith(KEY_TODAY_FILTER.toLowerCase())) {
+            String data = text.substring(KEY_TODAY_FILTER.length(), text.length()).trim();
+            String[] datas = data.split(",");
+            String city = datas[0];
+            String filter = datas[1];
+            int start = Integer.parseInt(datas[2]);
+            int end = Integer.parseInt(datas[3]);
+
+            LOG.info("Start range {} {}", start, end);
+            processMovies(aUserId, city, filter, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
             String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
             String[] datas = data.split(",");
