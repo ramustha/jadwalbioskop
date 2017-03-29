@@ -10,6 +10,7 @@ import com.ramusthastudio.zodiakbot.model.Payload;
 import com.ramusthastudio.zodiakbot.model.Postback;
 import com.ramusthastudio.zodiakbot.model.Result;
 import com.ramusthastudio.zodiakbot.model.ResultMovies;
+import com.ramusthastudio.zodiakbot.model.Schedule;
 import com.ramusthastudio.zodiakbot.model.Source;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -193,19 +194,26 @@ public class LineBotController {
             int start = Integer.parseInt(datas[1]);
             int end = Integer.parseInt(datas[2]);
 
-            processMovies(aUserId, city, start, end);
             LOG.info("Start range {} {}", start, end);
+            processMovies(aUserId, city, start, end);
           } else if (text.toLowerCase().startsWith(KEY_OVERVIEW.toLowerCase())) {
-            String sinopsis = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
+            String data = text.substring(KEY_OVERVIEW.length(), text.length()).trim();
+            String[] datas = data.split(" ");
+            String city = datas[0];
+            String title = datas[1];
 
-            LOG.info("Sinopsis {}", sinopsis);
+            LOG.info("Sinopsis city {} movie {}", city, title);
+            processOverviewMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_SCHEDULE.toLowerCase())) {
             String data = text.substring(KEY_SCHEDULE.length(), text.length()).trim();
             String[] datas = data.split(" ");
             String city = datas[0];
             String title = datas[1];
-            LOG.info("Kota {} movie {}", city, title);
+
+            LOG.info("Jadwal city {} movie {}", city, title);
+            processScheduleMovies(aUserId, city, title);
           } else if (text.toLowerCase().startsWith(KEY_HELP.toLowerCase())) {
+            instructionTweetsMessage(fChannelAccessToken, aUserId);
             LOG.info("Panduan");
           }
           break;
@@ -224,36 +232,7 @@ public class LineBotController {
         Result cinemaRes = cinemaToday.body();
         LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
 
-        List<Data> dataCinema = cinemaRes.getCinemaDatas();
-        List<Data> newCinema = new ArrayList<>();
-        for (Data data : dataCinema) {
-          String title = data.getMovie().toString();
-          Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
-          LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
-          if (moviesDb.isSuccessful()) {
-            DiscoverMovies moviesBody = moviesDb.body();
-            List<ResultMovies> moviesRes = moviesBody.getResultMovies();
-            if (moviesRes.size() != 0) {
-              ResultMovies movie = moviesRes.get(0);
-              String coverUrl;
-              if (movie.getBackdropPath() != null) {
-                coverUrl = fTheMovieBaseImgUrl + movie.getBackdropPath();
-              } else {
-                coverUrl = IMG_HOLDER;
-              }
-              data.setPoster(coverUrl);
-              data.setOverview(movie.getOverview());
-              data.setVoteAverage(movie.getVoteAverage());
-              newCinema.add(data);
-            } else {
-              data.setPoster(IMG_HOLDER);
-              data.setOverview("Tidak ada sinopsis...");
-              data.setVoteAverage(0.0);
-              newCinema.add(data);
-            }
-          }
-          LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
-        }
+        List<Data> newCinema = buildDatas(cinemaRes);
         if (newCinema.size() > 4) {
           buildMessage(cinemaRes, newCinema, aUserId, aStart, aEnd);
         } else {
@@ -265,6 +244,114 @@ public class LineBotController {
     } else {
       pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
     }
+  }
+
+  private void processOverviewMovies(String aUserId, String aCity, String aMovie) throws IOException {
+    String cityCandidate = generateCinemaId(aCity);
+    if (cityCandidate != null) {
+      LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      Response<Result> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
+
+      if (cinemaToday.isSuccessful()) {
+        Result cinemaRes = cinemaToday.body();
+        LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
+
+        List<Data> newCinema = buildDatas(cinemaRes);
+        for (Data data : newCinema) {
+          if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
+            pushMessage(fChannelAccessToken, aUserId,
+                aMovie +
+                    "\n" + "Judul :" + data.getMovie() +
+                    "\n" + "Durasi :" + data.getDuration() +
+                    "\n" + "Genre :" + data.getGenre() +
+                    "\n" + "Overview :" +
+                    "\n" + data.getOverview());
+          }
+        }
+      } else {
+        pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
+      }
+    } else {
+      pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
+    }
+  }
+
+  private void processScheduleMovies(String aUserId, String aCity, String aMovie) throws IOException {
+    String cityCandidate = generateCinemaId(aCity);
+    if (cityCandidate != null) {
+      LOG.info("BioskopBaseUrl {} BioskopApiKey {} cityID {}", fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      Response<Result> cinemaToday = getCinemaToday(fBioskopBaseUrl, fBioskopApiKey, cityCandidate);
+      LOG.info("cinemaToday code {} message {}", cinemaToday.code(), cinemaToday.message());
+
+      if (cinemaToday.isSuccessful()) {
+        Result cinemaRes = cinemaToday.body();
+        LOG.info("Kota {} Tanggal {}", cinemaRes.getCity(), cinemaRes.getDate());
+
+        List<Data> newCinema = buildDatas(cinemaRes);
+        StringBuilder builder = new StringBuilder();
+        for (Data data : newCinema) {
+          if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
+            builder
+                .append("\n").append("Judul : ").append(data.getMovie())
+                .append("\n").append("Genre : ").append(data.getGenre());
+            List<Schedule> schedules = data.getSchedule();
+            for (Schedule schedule : schedules) {
+              Object theater = schedule.getTheater();
+              Object price = schedule.getPrice();
+              builder
+                  .append("\n").append("Bioskop : ").append(theater)
+                  .append("\n").append("Harga : ").append(price)
+                  .append("\n").append("Jam : ");
+              List<Object> scheduleTimes = schedule.getScheduleTimes();
+              for (Object time : scheduleTimes) {
+                builder
+                    .append("\n").append(time);
+              }
+            }
+            pushMessage(fChannelAccessToken, aUserId, builder.toString());
+          }
+        }
+      } else {
+        pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
+      }
+    } else {
+      pushMessage(fChannelAccessToken, aUserId, "Hmmm... aku gak tahu nih kota mana yang kamu input, coba kota lain");
+    }
+  }
+
+  private List<Data> buildDatas(Result aCinemaRes) throws IOException {
+    List<Data> dataCinema = aCinemaRes.getCinemaDatas();
+    List<Data> newCinema = new ArrayList<>();
+    for (Data data : dataCinema) {
+      String title = data.getMovie().toString();
+      Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
+      LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
+      if (moviesDb.isSuccessful()) {
+        DiscoverMovies moviesBody = moviesDb.body();
+        List<ResultMovies> moviesRes = moviesBody.getResultMovies();
+        if (moviesRes.size() != 0) {
+          ResultMovies movie = moviesRes.get(0);
+          String coverUrl;
+          if (movie.getBackdropPath() != null) {
+            coverUrl = fTheMovieBaseImgUrl + movie.getBackdropPath();
+          } else {
+            coverUrl = IMG_HOLDER;
+          }
+          data.setPoster(coverUrl);
+          data.setOverview(movie.getOverview());
+          data.setVoteAverage(movie.getVoteAverage());
+          newCinema.add(data);
+        } else {
+          data.setPoster(IMG_HOLDER);
+          data.setOverview("Tidak ada sinopsis...");
+          data.setVoteAverage(0.0);
+          newCinema.add(data);
+        }
+      }
+      LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
+    }
+    return newCinema;
   }
 
   private void buildMessage(Result aCinema, List<Data> aDataMovies, String aUserId, int aStart, int aEnd) throws IOException {
