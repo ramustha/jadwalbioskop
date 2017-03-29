@@ -321,6 +321,7 @@ public class LineBotController {
         List<Data> newCinema = buildDatas(cinemaRes, null);
         StringBuilder builder1 = new StringBuilder();
         StringBuilder builder2 = new StringBuilder();
+        StringBuilder builder3 = new StringBuilder();
         for (Data data : newCinema) {
           if (data.getMovie().toString().equalsIgnoreCase(aMovie)) {
             builder1
@@ -330,12 +331,12 @@ public class LineBotController {
             if (aFilter != null) {
               for (Schedule schedule : schedules) {
                 if (schedule.getTheater().toString().toLowerCase().contains(aFilter.toLowerCase())) {
-                  buildTheater(builder1, builder2, schedule);
+                  buildTheater(builder1, builder2, builder3, schedule);
                 }
               }
             } else {
               for (Schedule schedule : schedules) {
-                buildTheater(builder1, builder2, schedule);
+                buildTheater(builder1, builder2, builder3 schedule);
               }
             }
             pushMessage(fChannelAccessToken, aUserId, builder1.toString());
@@ -350,10 +351,10 @@ public class LineBotController {
     }
   }
 
-  private static void buildTheater(StringBuilder aBuilder1, StringBuilder aBuilder2, Schedule schedule) {
+  private static void buildTheater(StringBuilder aBuilder1, StringBuilder aBuilder2, StringBuilder aBuilder3, Schedule schedule) {
     Object theater = schedule.getTheater();
     Object price = schedule.getPrice();
-    if (aBuilder1.length() < 1000) {
+    if (aBuilder1.length() < 1900) {
       aBuilder1
           .append("\n\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
@@ -362,7 +363,7 @@ public class LineBotController {
       for (Object time : scheduleTimes) {
         aBuilder1.append(time).append(" | ");
       }
-    }else {
+    } else if (aBuilder2.length() < 1900) {
       aBuilder2
           .append("\n\n").append("Bioskop : ").append(theater)
           .append("\n").append("Harga : ").append(price)
@@ -370,6 +371,15 @@ public class LineBotController {
       List<Object> scheduleTimes = schedule.getScheduleTimes();
       for (Object time : scheduleTimes) {
         aBuilder2.append(time).append(" | ");
+      }
+    }else {
+      aBuilder3
+          .append("\n\n").append("Bioskop : ").append(theater)
+          .append("\n").append("Harga : ").append(price)
+          .append("\n").append("| ");
+      List<Object> scheduleTimes = schedule.getScheduleTimes();
+      for (Object time : scheduleTimes) {
+        aBuilder3.append(time).append(" | ");
       }
     }
   }
