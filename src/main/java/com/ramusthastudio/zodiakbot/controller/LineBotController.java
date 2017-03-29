@@ -2,12 +2,14 @@ package com.ramusthastudio.zodiakbot.controller;
 
 import com.google.gson.Gson;
 import com.linecorp.bot.client.LineSignatureValidator;
+import com.ramusthastudio.zodiakbot.model.DiscoverMovies;
 import com.ramusthastudio.zodiakbot.model.Result;
 import com.ramusthastudio.zodiakbot.model.Data;
 import com.ramusthastudio.zodiakbot.model.Events;
 import com.ramusthastudio.zodiakbot.model.Message;
 import com.ramusthastudio.zodiakbot.model.Payload;
 import com.ramusthastudio.zodiakbot.model.Postback;
+import com.ramusthastudio.zodiakbot.model.ResultMovies;
 import com.ramusthastudio.zodiakbot.model.Source;
 import java.io.IOException;
 import java.util.List;
@@ -25,6 +27,7 @@ import org.springframework.web.bind.annotation.RestController;
 import retrofit2.Response;
 
 import static com.ramusthastudio.zodiakbot.util.BotHelper.FOLLOW;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.IMG_HOLDER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.JOIN;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.KEY_TODAY;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.LEAVE;
@@ -36,6 +39,7 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_ROOM;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_USER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.UNFOLLOW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.getCinemaToday;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.getSearchMovies;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessageGroup;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.instructionTweetsMessage;
@@ -180,7 +184,27 @@ public class LineBotController {
 
                   List<Data> dataCinema = cinemaRes.getCinemaDatas();
                   for (Data data : dataCinema) {
+                    String title = data.getMovie().toString();
+                    Response<DiscoverMovies> moviesDb = getSearchMovies(fTheMovieBaseUrl, fTheMovieApiKey, title);
+                    LOG.info("DiscoverMovies code {} message {}", moviesDb.code(), moviesDb.message());
+                    if (moviesDb.isSuccessful()) {
+                      DiscoverMovies moviesBody = moviesDb.body();
+                      List<ResultMovies> moviesRes = moviesBody.getResultMovies();
+                      if (moviesRes.size() != 0) {
+                        ResultMovies movie = moviesRes.get(0);
+                        String coverUrl;
+                        if (movie.getBackdropPath() != null) {
+                          coverUrl = movie.getBackdropPath();
+                        }else {
+                          coverUrl = IMG_HOLDER;
+                        }
+                        data.setPoster(coverUrl);
+                      }
+                    }
                     LOG.info("Movie {} genre {} jadwal {}", data.getMovie(), data.getDuration(), data.getSchedule());
+                  }
+                  for (Data data : dataCinema) {
+                    LOG.info("Movie {} genre {} poster {}", data.getMovie(), data.getDuration(), data.getPoster());
                   }
                 } else {
                   pushMessage(fChannelAccessToken, aUserId, "Hmmm... ada yang salah nih di server, coba beberapa saat lagi yah...");
