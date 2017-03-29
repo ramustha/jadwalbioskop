@@ -46,6 +46,7 @@ import static com.ramusthastudio.zodiakbot.util.BotHelper.SOURCE_USER;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.UNFOLLOW;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.carouselMessage;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.confirmMessage;
+import static com.ramusthastudio.zodiakbot.util.BotHelper.generateRandom;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.getCinemaToday;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.getSearchMovies;
 import static com.ramusthastudio.zodiakbot.util.BotHelper.greetingMessage;
@@ -255,8 +256,8 @@ public class LineBotController {
         case MESSAGE:
           if (aMessage.type().equals(MESSAGE_TEXT)) {
             String text = aMessage.text();
-            replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
             if (text.toLowerCase().startsWith(KEY_TODAY.toLowerCase())) {
+              replayMessage(fChannelAccessToken, aReplayToken, "Tunggu sebentar yah...");
               String today = text.substring(KEY_TODAY.length(), text.length()).trim();
               String[] candidats = today.split(",");
               if (candidats.length == 1) {
@@ -266,6 +267,12 @@ public class LineBotController {
                 String city = candidats[0].trim();
                 String cinema = candidats[1].trim();
                 processMovies(aUserId, city, cinema, 0, 4);
+              }
+            } else {
+              if (generateRandom(0, 5) > 2) {
+                replayMessage(fChannelAccessToken, aReplayToken, "Aku gak ngerti nih...");
+              } else {
+                instructionTweetsMessage(fChannelAccessToken, aUserId);
               }
             }
           } else {
