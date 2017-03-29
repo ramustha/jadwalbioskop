@@ -181,11 +181,11 @@ public class LineBotController {
               String today = text.substring(KEY_TODAY.length(), text.length()).trim();
               String[] candidats = today.split(",");
               if (candidats.length == 1) {
-                String city = candidats[0];
+                String city = candidats[0].trim();
                 processMovies(aUserId, city, null, 0, 4);
               } else {
-                String city = candidats[0];
-                String cinema = candidats[1];
+                String city = candidats[0].trim();
+                String cinema = candidats[1].trim();
                 processMovies(aUserId, city, cinema, 0, 4);
               }
             }
@@ -364,7 +364,7 @@ public class LineBotController {
       for (Data data : newCinema) {
         List<Schedule> schedules = data.getSchedule();
         for (Schedule schedule : schedules) {
-          if (schedule.getTheater().toString().contains(aFilter)) {
+          if (schedule.getTheater().toString().toLowerCase().contains(aFilter.toLowerCase())) {
             if (!newFilteredCinema.contains(data)) {
               newFilteredCinema.add(data);
             }
